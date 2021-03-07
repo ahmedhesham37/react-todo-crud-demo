@@ -1,0 +1,22 @@
+{
+  "todos": [
+    {
+      "id": 1,
+      "title": "React",
+      "body": "Study react",
+      "reminder": true
+    },
+    {
+      "id": 2,
+      "title": "Docker",
+      "body": "Study docker",
+      "reminder": true
+    },
+    {
+      "id": 3,
+      "title": "Nodejs",
+      "body": "Study Nodejs",
+      "reminder": false
+    }
+  ]
+}

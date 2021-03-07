@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import "./App.css";
 import AddTask from "components/AddTask";
 import Header from "components/Header";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import Footer from "components/Footer";
+import About from "components/About";
 
 const name = "Ahmed Hesham";
 
@@ -48,19 +51,37 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <Header
-        name={name}
-        onAdd={() => setshowAdd(!showAdd)}
-        showAdd={showAdd}
-      />
-      {showAdd && <AddTask onAdd={addTodo} />}
-      {todos.length > 0 ? (
-        <Todos todos={todos} onDelete={deleteTodo} reminder={reminder} />
-      ) : (
-        "No Tasks To View , You're good to go !"
-      )}
-    </div>
+    <Router>
+      <div className="container">
+        <Header
+          name={name}
+          onAdd={() => setshowAdd(!showAdd)}
+          showAdd={showAdd}
+        />
+
+        <Route
+          path="/"
+          exact
+          render={(props) => (
+            <>
+              {showAdd && <AddTask onAdd={addTodo} />}
+              {todos.length > 0 ? (
+                <Todos
+                  todos={todos}
+                  onDelete={deleteTodo}
+                  reminder={reminder}
+                />
+              ) : (
+                "No Tasks To View , You're good to go !"
+              )}
+            </>
+          )}
+        />
+      </div>
+
+      <Route path="/about" component={About} />
+      <Footer />
+    </Router>
   );
 }
 
