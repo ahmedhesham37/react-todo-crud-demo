@@ -1,5 +1,5 @@
 import Todos from "./components/Todos";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import AddTask from "components/AddTask";
 import Header from "components/Header";
@@ -11,43 +11,71 @@ const name = "Ahmed Hesham";
 
 function App() {
   const [showAdd, setshowAdd] = useState(false);
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      title: "React",
-      body: "Study react",
-      reminder: true,
-    },
-    {
-      id: 2,
-      title: "Docker",
-      body: "Study docker",
-      reminder: true,
-    },
-    {
-      id: 3,
-      title: "Nodejs",
-      body: "Study Nodejs",
-      reminder: false,
-    },
-  ]);
+  const [todos, setTodos] = useState([]);
 
-  const addTodo = (todo) => {
-    let id = Math.floor(Math.random() * 10000) + 1;
-    setTodos([...todos, { id, ...todo }]);
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTodos();
+      setTodos(tasksFromServer);
+    };
+    getTasks();
+  }, []);
+
+  // Fetch Todos
+  const fetchTodos = async () => {
+    const res = await fetch("http://localhost:5000/todos");
+    const data = await res.json();
+
+    return data;
   };
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-    // console.log("delete");
+  const fetchTodo = async (id) => {
+    const res = await fetch("http://localhost:5000/todos/" + id);
+    const data = await res.json();
+
+    return data;
   };
 
-  const reminder = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, reminder: !todo.reminder } : todo
-      )
-    );
+  const addTodo = async (todo) => {
+    const res = await fetch("http://localhost:5000/todos", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(todo),
+    });
+    const data = await res.json();
+    setTodos([...todos, data]);
+  };
+
+  const deleteTodo = async (id) => {
+    const res = await fetch("http://localhost:5000/todos/" + id, {
+      method: "DELETE",
+    });
+    res.status === 200
+      ? setTodos(todos.filter((todo) => todo.id !== id))
+      : alert("Error Deleting the task , please retry later");
+  };
+
+  const reminder = async (id) => {
+    const toUpdateTodo = await fetchTodo(id);
+    const updTodo = { ...toUpdateTodo, reminder: !toUpdateTodo.reminder };
+
+    const res = await fetch("http://localhost:5000/todos/" + id, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(updTodo),
+    });
+
+    res.status === 200
+      ? setTodos(
+          todos.map((todo) =>
+            todo.id === id ? { ...todo, reminder: !todo.reminder } : todo
+          )
+        )
+      : alert("Error Updating the task");
   };
 
   return (
